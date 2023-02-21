@@ -4,13 +4,15 @@ Hey Guys! This is the repository for our optimization project.
 
 To make your own version of the repository, use the following command
 
-git checkout -b THE-NAME-OF-MY-NEW-BRANCH
+`git checkout -b THE-NAME-OF-MY-NEW-BRANCH`
 
 To save a change to a version of the code use these commands:
 
+```
 git add ./
 git commit -m "A COMMENT ABOUT MY CHANGE"
 git push origin THE-BRANCH-IM-CHANGING
+```
 
 
 I've made a couple of folders:
