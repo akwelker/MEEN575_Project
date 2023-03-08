@@ -5,7 +5,7 @@
 import numpy as np
 from queue import PriorityQueue
 
-class PathFinder():
+class A_Star():
     """
     Class capable of returning the optimal path through g and h cost maps.
     Assumes 2 degrees of freedom
@@ -63,25 +63,28 @@ class PathFinder():
 
 
 
-    def a_star(max_iter = np.inf):
+    def solve(max_iter = np.inf):
         """
         Returns the optimal path through g and h cost maps.
         Assumes 2 degrees of freedom.
         """
+
+        pass
+
+
+    # Given a node, will explore around its exterior
+    def _explore(node):
+
+        location = node._location
+
+        pass
+
+    # location and a parent, will add a node to the search queue
+    def _search_node(parent, location):
+
+        pass
+
         
-        # Ensure g and h are valid
-        try: 
-            assert len(g.size) == 2
-            assert len(h.size) == 2
-            assert g.size == h.size
-
-        except:
-
-            raise Exception('ERROR: g and h are not equally sized (n x m) numpy arrays')
-
-
-
-
 
 
 
