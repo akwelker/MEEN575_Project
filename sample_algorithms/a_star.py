@@ -3,7 +3,7 @@
 # a_star.py -- Uses a_star to plot a path up a mountain
 
 import numpy as np
-from queue import PriorityQueue
+import heapq
 
 class A_Star():
     """
@@ -21,15 +21,15 @@ class A_Star():
     _g = None
     _h = None
 
-    _queue = PriorityQueue()
+    _queue = []
 
     def __init__(self, start, end, g, h) -> None:
 
          # Ensure g and h are valid size
         try: 
-            assert len(g.size) == 2
-            assert len(h.size) == 2
-            assert g.size == h.size
+            assert len(g.shape) == 2
+            assert len(h.shape) == 2
+            assert g.shape == h.shape
 
             self._g = g
             
@@ -40,8 +40,8 @@ class A_Star():
         # Ensure that start and end postions are valid
         try:
             assert len(start) == 2
-            assert start[0] >= 0 and start[0] < self._g.size[0]
-            assert start[1] >= 0 and start[1] < self._g.size[1]
+            assert start[0] >= 0 and start[0] < self._g.shape[0]
+            assert start[1] >= 0 and start[1] < self._g.shape[1]
 
             self._start = start
 
@@ -51,38 +51,124 @@ class A_Star():
 
         try:
             assert len(start) == 2
-            assert end[0] >= 0 and end[0] < self._g.size[0]
-            assert end[1] >= 0 and end[1] < self._g.size[1]
+            assert end[0] >= 0 and end[0] < self._g.shape[0]
+            assert end[1] >= 0 and end[1] < self._g.shape[1]
 
             self._end = end
 
         except:
             
             raise Exception('ERROR: end position is not a valid tuple')
-            
+        
+
+        self._start = start
+        self._end = end
+        self._g = g
+        self._h = h
+        self._queue = []
 
 
 
-    def solve(max_iter = np.inf):
+    def solve(self, max_iter = np.inf):
         """
         Returns the optimal path through g and h cost maps.
         Assumes 2 degrees of freedom.
         """
 
-        pass
+        # Reset queue and make the root node
+        self._queue = []
+        root = Node(location = self._start)
+        heapq.heappush(self._queue, root)
+
+        
+        # Now make result variables -- the current node and if we've reached the goal
+        curr_node = None
+        reached_end = False
+
+        # Now begin the search
+
+        itr = 0
+
+        while itr < max_iter and reached_end == False and len(self._queue) > 0:
+
+            curr_node = heapq.heappop(self._queue)
+
+            # Check if we've reached our goal
+
+            if curr_node.getLocation() == self._end:
+
+                reached_end = True
+
+            else:
+
+                self._explore(curr_node)
+                itr += 1
+
+        
+        if not reached_end:
+
+            print(bcolors.WARNING + "WARNING:" + bcolors.ENDC +" A* did not reach its goal!")
+            
+            return [], np.inf
+
+        return curr_node.getPath(), curr_node.getCost()
+
+            
+    
+
+
+
+
 
 
     # Given a node, will explore around its exterior
-    def _explore(node):
+    def _explore(self, node):
 
         location = node._location
 
-        pass
+        #explore n
+        if location[0] > 0:
+            
+            new_location = np.copy(location)
+            new_location[0] -= 1
+            self._search_node(node, new_location)
+
+        # explore s
+        if location[0] < self._g.shape[0] - 1:
+
+            new_location = np.copy(location)
+            new_location[0] += 1
+            self._search_node(node, new_location)
+
+
+        # explore e
+        if location[1] > 0:
+            
+            new_location = np.copy(location)
+            new_location[1] -= 1
+            self._search_node(node, new_location)
+
+        # explore w
+        if location[1] < self._g.shape[1] - 1:
+
+            new_location = np.copy(location)
+            new_location[1] += 1
+            self._search_node(node, new_location)
+
 
     # location and a parent, will add a node to the search queue
-    def _search_node(parent, location):
+    def _search_node(self, parent, location):
+        """
+        Given a parent node, and a location,
+        will add a new node to the prioirty queue
+        """
 
-        pass
+        g_cost = self._g[location[0]][location[1]]
+        h_cost = self._h[location[0]][location[1]]
+
+        new_node = Node(parent, location, g=g_cost, h= h_cost)
+
+        heapq.heappush(self._queue, new_node)
 
         
 
@@ -124,7 +210,7 @@ class Node:
 
         # now add where we are currently
 
-        path.append(self._location)
+        path.append(self.getLocation())
 
         # return the path
         return path
@@ -136,9 +222,82 @@ class Node:
         Returns the total path cost of the node that is being examined
         """ 
         return self._cost
+    
+    def getLocation(self):
+        """
+        Return the location as a python list
+        """
+        loc_x = self._location[0]
+        loc_y = self._location[1]
 
+        return [loc_x, loc_y]
+    
+    # To String Method
+
+    def __str__(self) -> str:
+        
+        loc_x = self._location[0]
+        loc_y = self._location[1]
+
+        return f'Node(Cost: {self.getCost()}, Location: {loc_x}, {loc_y})'
 
     
+
+    # Comparitor methods
+
+    def __eq__ (self, other):
+
+        if isinstance(other, Node):
+
+            return self.getCost() == other.getCost()
+        
+        elif other == None:
+
+                return False    
+        else:
+
+            raise Exception("Nodes Must Be Compared to Other Nodes")
+
+    def __gt__(self, other):
+
+        if isinstance(other, Node):
+
+            return self.getCost() > other.getCost()
+        
+        elif other == None:
+
+                return False    
+        else:
+
+           raise Exception("Nodes Must Be Compared to Other Nodes")
+
+    def __lt__(self, other):
+
+        if isinstance(other, Node):
+
+            return self.getCost() < other.getCost()
+        
+        elif other == None:
+
+                return False    
+        
+        else:
+
+           raise Exception("Nodes Must Be Compared to Other Nodes")
+    
+
+# NGL got this from stack overflow
+# --> https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 
 
