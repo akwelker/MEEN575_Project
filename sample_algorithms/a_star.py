@@ -69,7 +69,7 @@ class A_Star():
 
 
 
-    def solve(self, max_iter = np.inf):
+    def solve(self, max_iter = np.inf, func_g = None, func_h = None):
         """
         Returns the optimal path through g and h cost maps.
         Assumes 2 degrees of freedom.
@@ -101,7 +101,7 @@ class A_Star():
 
             else:
 
-                self._explore(curr_node)
+                self._explore(curr_node, func_g=func_g, func_h=func_h)
                 itr += 1
 
         
@@ -122,7 +122,7 @@ class A_Star():
 
 
     # Given a node, will explore around its exterior
-    def _explore(self, node):
+    def _explore(self, node, func_g = None, func_h = None):
 
         location = node._location
 
@@ -131,14 +131,14 @@ class A_Star():
             
             new_location = np.copy(location)
             new_location[0] -= 1
-            self._search_node(node, new_location)
+            self._search_node(node, new_location, func_g=func_g, func_h=func_h)
 
         # explore s
         if location[0] < self._g.shape[0] - 1:
 
             new_location = np.copy(location)
             new_location[0] += 1
-            self._search_node(node, new_location)
+            self._search_node(node, new_location, func_g=func_g, func_h=func_h)
 
 
         # explore e
@@ -146,25 +146,33 @@ class A_Star():
             
             new_location = np.copy(location)
             new_location[1] -= 1
-            self._search_node(node, new_location)
-
+            self._search_node(node, new_location, func_g=func_g, func_h=func_h)
         # explore w
         if location[1] < self._g.shape[1] - 1:
 
             new_location = np.copy(location)
             new_location[1] += 1
-            self._search_node(node, new_location)
+            self._search_node(node, new_location, func_g=func_g, func_h=func_h)
 
 
     # location and a parent, will add a node to the search queue
-    def _search_node(self, parent, location):
+    def _search_node(self, parent, location, func_g = None, func_h = None):
         """
         Given a parent node, and a location,
         will add a new node to the prioirty queue
         """
 
-        g_cost = self._g[location[0]][location[1]]
-        h_cost = self._h[location[0]][location[1]]
+        #if we're passed a function, use that to calculate hueristic and cost
+        # else use the localized cost
+        if func_g == None:
+            g_cost = self._g[location[0]][location[1]]
+        else:
+            g_cost = func_g((location[0], location[1]))
+        
+        if func_h == None:
+            h_cost = self._h[location[0]][location[1]]
+        else:
+            h_cost = func_h((location[0], location[1]))
 
         new_node = Node(parent, location, g=g_cost, h= h_cost)
 
