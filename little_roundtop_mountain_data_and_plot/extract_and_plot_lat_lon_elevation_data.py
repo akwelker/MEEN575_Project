@@ -2,6 +2,10 @@ import rasterio
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Define the bounding box of the target geographical range
+minX, minY = (-76.943693, 40.090454)
+maxX, maxY = (-76.907129, 40.115401)
+
 # Open the .tif file using rasterio
 with rasterio.open('little_roundtop_mountain_data_and_plot\output_USGS1m.tif') as src:
     # Read the raster data into a numpy array
@@ -15,16 +19,16 @@ with rasterio.open('little_roundtop_mountain_data_and_plot\output_USGS1m.tif') a
 cols, rows = np.meshgrid(np.arange(array.shape[1]), np.arange(array.shape[0]))
 # Transform coordinates to latitude and longitude
 lon, lat = transform * (cols, rows)
+
+# Map latitude and longitude to the target bounding box
+lon = np.interp(lon, (left, right), (minX, maxX))
+lat = np.interp(lat, (bottom, top), (minY, maxY))
+
 # Get elevation data
 elevation = array
 
 # Plot the raster using matplotlib
 fig, ax = plt.subplots()
-plt.imshow(array, extent=[left, right, bottom, top], cmap='terrain')
+plt.imshow(array, extent=[minX, maxX, minY, maxY], cmap='terrain')
 plt.colorbar()
 plt.show()
-
-print(lon)
-print(np.shape(lon))
-print(np.shape(lat))
-print(np.shape(elevation))
