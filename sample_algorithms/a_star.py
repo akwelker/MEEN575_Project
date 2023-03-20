@@ -167,12 +167,12 @@ class A_Star():
         if func_g == None:
             g_cost = self._g[location[0]][location[1]]
         else:
-            g_cost = func_g((location[0], location[1]))
+            g_cost = func_g((location[0], location[1]), parent)
         
         if func_h == None:
             h_cost = self._h[location[0]][location[1]]
         else:
-            h_cost = func_h((location[0], location[1]))
+            h_cost = func_h((location[0], location[1]), parent)
 
         new_node = Node(parent, location, g=g_cost, h= h_cost)
 

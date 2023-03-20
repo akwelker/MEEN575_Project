@@ -126,6 +126,9 @@ class Test_A_Star(test.TestCase):
         searcher = A_Star([0,0], [2,2], g, h)
 
         path, cost = searcher.solve()
+
+        print(path)
+        print(cost)
     
     
         self.assertEqual(path, [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2]])
