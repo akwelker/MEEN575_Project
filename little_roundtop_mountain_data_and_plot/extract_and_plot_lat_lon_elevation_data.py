@@ -28,7 +28,6 @@ lat = np.interp(lat, (bottom, top), (minY, maxY))
 elevation = array
 
 # Plot the raster using matplotlib
-fig_1, ax_1 = plt.subplots()
 plt.imshow(array, extent=[minX, maxX, minY, maxY], cmap='terrain')
 plt.colorbar()
 plt.show()
