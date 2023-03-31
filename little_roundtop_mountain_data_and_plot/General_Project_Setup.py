@@ -183,10 +183,10 @@ end_point_y = y_data[end_point_idx[1]]
 end_point_x = x_data[end_point_idx[0]]
 
 # Manually Chosen Start Point
-start_point_x = 2000
+start_point_x = 500
 start_point_y = 500
 
-num_waypoints = 25
+num_waypoints = 12
 num_segments = num_waypoints + 1
 num_total_points = num_waypoints + 2
 
@@ -194,7 +194,7 @@ x0 = np.zeros(num_waypoints*2)
 spacing_x = (end_point_x - start_point_x)/(num_waypoints+1)
 spacing_y = (end_point_y - start_point_y)/(num_waypoints+1)
 
-range_noise = 75
+range_noise = 150
 
 for i in range(num_waypoints):
     x0[2*i] = (start_point_x + (i+1)*spacing_x) + random.uniform(-1*range_noise, range_noise)
@@ -218,11 +218,13 @@ slope_constraint_degrees = 12
 segment_slope_constraints = NonlinearConstraint(g1, lb = -np.inf, ub = 0, jac = jac_constraint)
 
 # res = minimize(objective_f, x0, constraints=segment_slope_constraints, bounds=geographic_bounds, tol=1e-7, options=optimizer_options)
-# res = minimize(objective_f, x0, bounds=geographic_bounds, tol=1e-7, options=optimizer_options)
+
 # res = minimize(obj, x0, bounds=geographic_bounds, tol=1e-7, options=optimizer_options, jac = True)
 
 
-res = minimize(obj, x0, constraints=segment_slope_constraints, bounds=geographic_bounds, tol=1e-7, options=optimizer_options, jac = True)
+res = minimize(objective_f, x0, bounds=geographic_bounds, method = 'Powell' , tol=1e-7, options=optimizer_options)
+
+# res = minimize(obj, x0, constraints=segment_slope_constraints, bounds=geographic_bounds, tol=1e-7, options=optimizer_options, jac = True)
 print(res)
 
 # print('x*', res.x)
