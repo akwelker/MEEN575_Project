@@ -45,6 +45,23 @@ def Get_Elevation(x_point, y_point):
 get_max_index = lambda x: np.unravel_index(np.argmax(x), x.shape)   #Finds index of max value
 get_min_index = lambda x: np.unravel_index(np.argmin(x), x.shape)   #Finds index of min value
 
+
+def Compute_Linear_Path_Noisy(num_waypoints, start_point_x, start_point_y, end_point_x, end_point_y, range_noise):
+    x0 = np.zeros(num_waypoints*2)
+    spacing_x = (end_point_x - start_point_x)/(num_waypoints+1)
+    spacing_y = (end_point_y - start_point_y)/(num_waypoints+1)
+
+    x_array = np.zeros(num_waypoints)
+    y_array = np.zeros(num_waypoints)
+
+    for i in range(num_waypoints):
+        x0[2*i] = (start_point_x + (i+1)*spacing_x) + random.uniform(-1*range_noise, range_noise)
+        x_array[i] = x0[2*i]
+        x0[2*i + 1] = (start_point_y + (i+1)*spacing_y) + random.uniform(-1*range_noise, range_noise)
+        y_array[i] = x0[2*i + 1]
+
+    return x0, x_array, y_array
+
 def toblers_hiking_function(slope):         
     return 1000*6*math.exp(-3.5*abs(slope+.05))    #Computes speed in m/hr
 
