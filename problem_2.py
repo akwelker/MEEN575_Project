@@ -7,7 +7,6 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import math
 import random
 from scipy.optimize import minimize, NonlinearConstraint, Bounds 
 from binary_GA import *
@@ -27,7 +26,7 @@ for i in range(num_waypoints):
 
 def penalty_obj_function(x):
 
-    penalty = 0.005
+    penalty = 0.00001
 
     sumation = 0
 
@@ -41,7 +40,7 @@ def penalty_obj_function(x):
 
     return sumation
 
-ga_optimizer = Binary_GA(500,2500,32,verbose=True) # Initalize the optimizer
+ga_optimizer = Binary_GA(0,1400,32,verbose=True) # Initalize the optimizer
 
 result = ga_optimizer.GA_optimization(penalty_obj_function,5000,200, num_waypoints*2)
 
@@ -70,6 +69,8 @@ y_points.append(end_point_y)
 
 plt.contour((x_data), (y_data), np.transpose(elevation), 25)
 plt.colorbar()
+
+print(f'{max(x_data), max(y_data)}')
 
 plt.plot(x_points,y_points,'r*-')
 

@@ -6,10 +6,10 @@ from scipy.interpolate import RectBivariateSpline
 CONVERT_COORD_TO_METER = 111139
 
 #From GEOTIFF Download
-MIN_LAT = 40.090454
-MIN_LON = 76.907129
-MAX_LAT = 40.115401
-MAX_LON = 76.943693
+MIN_LAT = 40.238008
+MIN_LON = -111.628239
+MAX_LAT = 40.254288
+MAX_LON = -111.615536
 
 minX = 0
 maxX = abs(MAX_LON - MIN_LON) * CONVERT_COORD_TO_METER
@@ -20,7 +20,7 @@ maxY = abs(MAX_LAT - MIN_LAT) * CONVERT_COORD_TO_METER
 def Extract_Geotiff_Data():
 
     # Open the .tif file using rasterio
-    with rasterio.open('output_USGS1m.tif') as src:
+    with rasterio.open('yMount_1m.tif') as src:
         # Read the raster data into a numpy array
         array = src.read(1)
         # Define the extent of the raster
@@ -66,12 +66,12 @@ maxX = x_data[len(x_data) - 1]  #Ensuer that the interpolation onto the meter gr
 maxY = y_data[len(y_data) - 1]
 
 end_point_idx = get_max_index(elevation)
-end_point_y = y_data[end_point_idx[1]]
-end_point_x = x_data[end_point_idx[0]]
+end_point_y = 1106.223475
+end_point_x = 889.1677776
 
 # Manually Chosen Start Point
-start_point_x = 500
-start_point_y = 500
+start_point_x = 120.5839419
+start_point_y = 756.8839002
 
 num_waypoints = 12
 num_segments = num_waypoints + 1
