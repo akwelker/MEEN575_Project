@@ -181,6 +181,52 @@ class A_Star():
             if node._parent == None or not node.hasPastLocation(new_location):
                 self._search_node(node, new_location, func_g=func_g, func_h=func_h)
 
+        
+        # explore nw
+        if location[0] > 0 and location[1] < self._g.shape[1] - 1:
+            
+            new_location = np.copy(location)
+            new_location[0] -= 1
+            new_location[1] += 1
+
+            if node._parent == None or not node.hasPastLocation(new_location):
+                self._search_node(node, new_location, func_g=func_g, func_h=func_h)
+
+
+        # explore sw
+        if location[0] < self._g.shape[0] - 1 and location[1] < self._g.shape[1] - 1:
+
+            new_location = np.copy(location)
+            new_location[0] += 1
+            new_location[1] += 1
+            
+            if node._parent == None or not node.hasPastLocation(new_location):
+                self._search_node(node, new_location, func_g=func_g, func_h=func_h)
+
+
+        # explore se
+
+        if location[0] < self._g.shape[0] - 1 and location[1] > 0:
+
+            new_location = np.copy(location)
+            new_location[0] += 1
+            new_location[1] -= 1
+            
+            if node._parent == None or not node.hasPastLocation(new_location):
+                self._search_node(node, new_location, func_g=func_g, func_h=func_h)
+
+
+
+        # explore ne
+        if location[0] > 0 and location[1] > 0:
+
+            new_location = np.copy(location)
+            new_location[0] -= 1
+            new_location[1] -= 1
+            
+            if node._parent == None or not node.hasPastLocation(new_location):
+                self._search_node(node, new_location, func_g=func_g, func_h=func_h)
+
 
 
     # location and a parent, will add a node to the search queue
