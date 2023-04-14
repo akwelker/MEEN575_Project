@@ -97,10 +97,13 @@ class A_Star():
         while itr < max_iter and reached_end == False and len(self._queue) > 0:
 
             curr_node = heapq.heappop(self._queue)
+            #print(curr_node.getPath())
 
             # Check if we've reached our goal
+            curr_x = curr_node.getLocation()[0]
+            curr_y = curr_node.getLocation()[1]
 
-            if curr_node.getLocation() == self._end:
+            if curr_x == self._end[0] and curr_y == self._end[1]:
 
                 reached_end = True
 
@@ -109,12 +112,16 @@ class A_Star():
                 self._explore(curr_node, func_g=func_g, func_h=func_h)
                 itr += 1
 
+            if(verbose):
+
+                print(bcolors.OKCYAN + 'Iterations: ' + bcolors.ENDC + f"{itr}")
+
         
         if not reached_end:
             
             print(bcolors.WARNING + "WARNING:" + bcolors.ENDC +" A* did not reach its goal!")
             
-            return [], np.inf
+            return curr_node.getPath(), np.inf
         
         if verbose:
 
@@ -140,28 +147,40 @@ class A_Star():
             
             new_location = np.copy(location)
             new_location[0] -= 1
-            self._search_node(node, new_location, func_g=func_g, func_h=func_h)
+
+            if node._parent == None or not node.hasPastLocation(new_location):
+                self._search_node(node, new_location, func_g=func_g, func_h=func_h)
 
         # explore s
         if location[0] < self._g.shape[0] - 1:
 
             new_location = np.copy(location)
             new_location[0] += 1
-            self._search_node(node, new_location, func_g=func_g, func_h=func_h)
-
+            
+            if node._parent == None or not node.hasPastLocation(new_location):
+                self._search_node(node, new_location, func_g=func_g, func_h=func_h)
 
         # explore e
         if location[1] > 0:
             
             new_location = np.copy(location)
             new_location[1] -= 1
-            self._search_node(node, new_location, func_g=func_g, func_h=func_h)
+
+            if node._parent == None or not node.hasPastLocation(new_location):
+                self._search_node(node, new_location, func_g=func_g, func_h=func_h)
+
+
+
         # explore w
         if location[1] < self._g.shape[1] - 1:
 
             new_location = np.copy(location)
             new_location[1] += 1
-            self._search_node(node, new_location, func_g=func_g, func_h=func_h)
+
+
+            if node._parent == None or not node.hasPastLocation(new_location):
+                self._search_node(node, new_location, func_g=func_g, func_h=func_h)
+
 
 
     # location and a parent, will add a node to the search queue
@@ -248,6 +267,22 @@ class Node:
         loc_y = self._location[1]
 
         return [loc_x, loc_y]
+    
+
+    def hasPastLocation(self,location) -> bool:
+        
+        i = location[0]
+        j = location[1]
+
+        path = self.getPath()
+
+        for point in path:
+
+            if point[0] == i and point[1] == j:
+
+                return True 
+            
+        return False
     
     # To String Method
 

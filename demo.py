@@ -8,7 +8,6 @@ from matplotlib import pyplot as plt
 import a_star
 
 import mountain_geography
-import path_problem
 
 # ========================== Extract Data and Create H hueristic Matrix =======================
 x_points, y_points, ell_data = mountain_geography.Extract_Geotiff_Raw()
@@ -17,7 +16,7 @@ x_points, y_points, ell_data = mountain_geography.Extract_Geotiff_Raw()
 get_max_index = lambda x: np.unravel_index(np.argmax(x), x.shape)
 get_min_index = lambda x: np.unravel_index(np.argmin(x), x.shape)
 
-trail_end = get_max_index(ell_data)
+trail_end = (30,37)
 
 def get_location(index):
 
@@ -35,7 +34,7 @@ trail_end_loc = get_location(trail_end).T
 
 print(f'End of Trail @ {(trail_end_loc.item(0), trail_end_loc.item(1), trail_end_loc.item(2))}')
 
-trail_head = (0,0)
+trail_head = (10,10)
 
 # Make a map of all point data as well as h hueristic matrix
 master_map = []
@@ -56,13 +55,14 @@ for i in range(0, len(x_points)):
         loc_y = y_points[i][j]
         loc_z = ell_data[i][j]
 
-        h[i][j] = np.linalg.norm(get_location((i,j)).T - trail_end_loc)
-
-
+        h[i][j] = np.linalg.norm(get_location((i,j)).T - trail_end_loc) ** 4
+        # h[i][j] = np.linalg.norm(np.array([i-trail_end[0], j-trail_end[1]]))
 
     master_map.append(new_row)
 
 print("H MATRIX CREATED!")
+
+print(x_points.shape)
 
 # ==================================================== MAKE G COST FUNCTION ==================================
 
@@ -73,13 +73,13 @@ def slope_constrnt(dx, dz) -> float:
 
     angle = np.arctan2(dz,dx)
 
-    return angle - MAX_SLOPE_ANGLE
+    return abs(angle - MAX_SLOPE_ANGLE)
 
 
 # Define the cost function g 
 def g_tobler(location, parent: a_star.Node):
 
-    CNSTRNT_GAIN = 0.05
+    CNSTRNT_GAIN = 4
 
     # Get beginning and ending points
     destination = get_location(location)
@@ -98,17 +98,32 @@ def g_tobler(location, parent: a_star.Node):
 
     time = walking_speed/distance
 
-    cnstrnt_cost = CNSTRNT_GAIN * slope_constrnt(flat_distance, dz)
+    cnstrnt_cost = slope_constrnt(flat_distance, dz) ** 3
 
     return time + cnstrnt_cost
 
 #====================================== call A* path plan =================================================
+start = (0,0)
 
-path_planner = a_star.A_Star((0,0), trail_end, np.zeros_like(h), h)
 
-#path_planner.solve(func_g= g_tobler, verbose = True)
+path_planner = a_star.A_Star(trail_head, trail_end, np.zeros_like(h), h)
+path, cost = path_planner.solve(func_g= g_tobler, verbose = True, max_iter=1e5)
+
+print(path)
 
 # Then plot the given path
 
-# plt.contour(x_points, y_points, ell_data, 50)
-# plt.show()
+path_x = []
+path_y = []
+
+for point in path:
+
+    path_x.append(master_map[point[0]][point[1]][0])
+    path_y.append(master_map[point[0]][point[1]][1])
+
+plt.contour(x_points, y_points, ell_data, 50)
+plt.plot(path_x,path_y, 'r-')
+
+plt.plot(get_location(start)[0], get_location(start)[1], 'xr')
+plt.plot(get_location(trail_end)[0], get_location(trail_end)[1], 'xr')
+plt.show()

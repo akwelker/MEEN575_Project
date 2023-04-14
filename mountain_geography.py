@@ -19,7 +19,7 @@ maxY = abs(MAX_LAT - MIN_LAT) * CONVERT_COORD_TO_METER
 ##============================= Extracting GEO DATA ============================
 def Extract_Geotiff_Raw():
     # Open the .tif file using rasterio
-    with rasterio.open('output_USGS1m.tif') as src:
+    with rasterio.open('output_USGS30m.tif') as src:
         # Read the raster data into a numpy array
         ell_data = src.read(1)
         # Define the extent of the raster
